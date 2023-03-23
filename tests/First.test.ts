@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test'
+import { resolveModuleName } from 'typescript'
 const baseURL = 'https://reqres.in/'
 test.describe.parallel('ALL the APIS at regress.in',()=>{
 
@@ -144,4 +145,35 @@ test ( "PUT update ",async ({request}) => {
     expect (await responce.status()).toBe(200)
 
 })
+})
+test( ' POST  register unsuccessful ',async ({request}) => {
+    const responce = request.post(`${baseURL}api/register`,{
+        data : {
+            "email": "walikhan@gmail.com",
+            "password": "pistol"
+        }
+    })
+    const responceBody =JSON.parse(await (await responce).text())
+    // console.log(await (await responce).body())
+    console.log(responceBody.email)
+    console.log(await (await responce).status())
+    expect(await (await responce).status()).toBe(400)
+    // expect(await responceBody.email).toContain('w alikhan@gmail.com')
+    console.log(await (await responce).statusText())
+    console.log(await (await responce).text())
+    expect(await (await responce).text()).toContain('{"error":"Note: Only defined users succeed registration"}')
+})
+test.only( ' POST  register successful ',async ({request}) => {
+    const responce = request.post(`${baseURL}api/register`,{
+        data : {
+                "email": "eve.holt@reqres.in",
+                "password": "pistol"
+            }
+            
+        })
+        const responceBody =JSON.parse(await (await responce).text())
+        expect (responceBody.id).toBe(4)
+        expect((await responce).status()).toBe(200)
+        expect(await (await responce).statusText()).toBe('OK')
+        console.log(await (await responce).text())
 })
