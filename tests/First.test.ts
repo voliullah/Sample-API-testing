@@ -1,5 +1,5 @@
 import {test, expect} from '@playwright/test'
-import { resolveModuleName } from 'typescript'
+import { couldStartTrivia, resolveModuleName } from 'typescript'
 const baseURL = 'https://reqres.in/'
 test.describe.parallel('ALL the APIS at regress.in',()=>{
 
@@ -74,17 +74,23 @@ test( "  GET the created one above  ",async ({request}) => {
     expect (await responce.body).toBeTruthy()
     
 })
-test.only(" GET Login Successfull",async ({request}) => {
+test(" GET Login Successfull(bug found)",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : {
             email : "eve.holt@reqres.in",
-            password : "cityslicka"
+            password : "wronpasssswordhasbeengiven"
         }
     })
     const responceBody = JSON.parse(await responce.text())
-    console.log(responceBody)
-    
-
+    console.log(responceBody.token)
+    expect(await responce.status()).toBe(200)
+    expect(await responceBody).toStrictEqual({"token": "QpwL5tke4Pnpja7X4"})
+    expect(await responceBody).toBeTruthy()
+    if (responceBody !=null){
+        console.log('user has logged in to the account even though the password is incorrect ')
+        }else
+    console.log(responceBody.error)
+    console.log('when you give it wrong email it doesnt generate any tokenn, and if you give it the right email with random input in password , it does generate a token ')
 })
 test("POST SUCCESSFUL",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
@@ -104,7 +110,9 @@ test("  POST login unseccessfull",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : 
             {
-                "email": "eve.holt@reqres.in",
+                email: "eve.holt@reqres.in",
+                // password : "shouldnt be giving it password "
+
             }
     })
  const responceBody = JSON.parse (await responce.text())
@@ -187,4 +195,13 @@ test('PATCH update ',async ({request}) => {
     expect (await responce.status()).toBe(200)
     expect(await responceBody.job).toBe('okay okay')
     console.log(responceBody.name)
+})
+
+test.only('  GET  Delayed responce ',async ({request}) => {
+    const responce  = await request.get(`${baseURL}api/users?delay=3`)
+    const responceBody = JSON.stringify(await responce.text())
+    console.log(await responce.status())
+    expect (await responce.status()).toBe(200)
+    console.log(await responce.statusText())
+    expect (await responce.statusText()).toBe('OK')
 })
