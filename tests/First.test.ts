@@ -13,7 +13,6 @@ test ( " GET list users ",async ({request}) => {
     expect (await responce.statusText()).toBe('OK')
     expect (await responce.status()).toBe(200)
 })
-//hereeee
 test ( " GET Single User",async ({request}) => {
     const responce = await request.get(`${baseURL}api/users/2`)
     const responceBody = JSON.parse(await responce.text())
@@ -51,7 +50,7 @@ test ( "  GET Single <RESOURCE> not found ",async ({request}) => {
     expect (await responce.statusText()).toBe('Not Found')
 })
 
-test ( "  POST create  ",async ({request}) => {
+test ( "  POST Create  ",async ({request}) => {
     const responce = await request.post(`${baseURL}api/users`,{
         data : {
             name  : "makawa00",
@@ -66,7 +65,7 @@ test ( "  POST create  ",async ({request}) => {
     expect(responceBody.createdAt).toBeTruthy()
     expect (await responce.statusText()).toBe('Created')
 })
-test( "  GET the created one above   ",async ({request}) => {
+test( "  GET the created one above  ",async ({request}) => {
     const responce = await request.get(`${baseURL}api/user/100`)
     const responceBody = JSON.parse(await responce.text())
     // expect (await responce.status()).toBe(200)
@@ -75,7 +74,7 @@ test( "  GET the created one above   ",async ({request}) => {
     expect (await responce.body).toBeTruthy()
     
 })
-test(" GET Login successfull",async ({request}) => {
+test(" GET Login Successfull",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : {
             email : "eve.holt@reqres.in",
@@ -87,7 +86,6 @@ test(" GET Login successfull",async ({request}) => {
     
 
 })
-//hereeee
 test("POST SUCCESSFUL",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : 
@@ -163,7 +161,7 @@ test( ' POST  register unsuccessful ',async ({request}) => {
     console.log(await (await responce).text())
     expect(await (await responce).text()).toContain('{"error":"Note: Only defined users succeed registration"}')
 })
-test.only( ' POST  register successful ',async ({request}) => {
+test( ' POST  register successful ',async ({request}) => {
     const responce = request.post(`${baseURL}api/register`,{
         data : {
                 "email": "eve.holt@reqres.in",
@@ -176,4 +174,17 @@ test.only( ' POST  register successful ',async ({request}) => {
         expect((await responce).status()).toBe(200)
         expect(await (await responce).statusText()).toBe('OK')
         console.log(await (await responce).text())
+})
+test('PATCH update ',async ({request}) => {
+    const responce = await request.patch(`${baseURL}api/users/3`,{
+        data : {
+                "name": "cmon bruh ",
+                "job": "okay okay"
+        } 
+    })
+    const responceBody = JSON.parse(await responce.text())
+    expect (await responce.statusText()).toBe('OK')
+    expect (await responce.status()).toBe(200)
+    expect(await responceBody.job).toBe('okay okay')
+    console.log(responceBody.name)
 })
