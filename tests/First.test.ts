@@ -74,7 +74,7 @@ test( "  GET the created one above  ",async ({request}) => {
     expect (await responce.body).toBeTruthy()
     
 })
-test(" GET Login Successfull",async ({request}) => {
+test.only(" GET Login Successfull",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : {
             email : "eve.holt@reqres.in",
