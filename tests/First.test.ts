@@ -204,4 +204,16 @@ test.only('  GET  Delayed responce ',async ({request}) => {
     expect (await responce.status()).toBe(200)
     console.log(await responce.statusText())
     expect (await responce.statusText()).toBe('OK')
+    const timing = await request.timing()
+    const responcetime = timing.
 })
+import { Browser, Page, request,Request } from '@playwright/test'
+
+  test('should measure response time and assert on it', async ({request}) => {
+    const response: Response = await page.goto('https://example.com');
+    // const request = response.request();
+    const timing = await request.timing();
+    const responseTime = timing.responseEnd - timing.requestStart;
+
+    expect(responseTime).toBeLessThan(500); // Assert that response time is less than 500ms
+  })
