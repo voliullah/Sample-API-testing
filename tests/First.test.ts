@@ -1,4 +1,5 @@
 import {test, expect} from '@playwright/test'
+import { couldStartTrivia, resolveModuleName } from 'typescript'
 const baseURL = 'https://reqres.in/'
 test.describe.parallel('ALL the APIS at regress.in',()=>{
 
@@ -49,7 +50,7 @@ test ( "  GET Single <RESOURCE> not found ",async ({request}) => {
     expect (await responce.statusText()).toBe('Not Found')
 })
 
-test ( "  POST create  ",async ({request}) => {
+test ( "  POST Create  ",async ({request}) => {
     const responce = await request.post(`${baseURL}api/users`,{
         data : {
             name  : "makawa00",
@@ -64,7 +65,7 @@ test ( "  POST create  ",async ({request}) => {
     expect(responceBody.createdAt).toBeTruthy()
     expect (await responce.statusText()).toBe('Created')
 })
-test( "  GET the created one above   ",async ({request}) => {
+test( "  GET the created one above  ",async ({request}) => {
     const responce = await request.get(`${baseURL}api/user/100`)
     const responceBody = JSON.parse(await responce.text())
     // expect (await responce.status()).toBe(200)
@@ -73,19 +74,24 @@ test( "  GET the created one above   ",async ({request}) => {
     expect (await responce.body).toBeTruthy()
     
 })
-test(" GET Login successfull",async ({request}) => {
+test(" GET Login Successfull(bug found)",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : {
             email : "eve.holt@reqres.in",
-            password : "cityslicka"
+            password : "wronpasssswordhasbeengiven"
         }
     })
     const responceBody = JSON.parse(await responce.text())
-    console.log(responceBody)
-    
-
+    console.log(responceBody.token)
+    expect(await responce.status()).toBe(200)
+    expect(await responceBody).toStrictEqual({"token": "QpwL5tke4Pnpja7X4"})
+    expect(await responceBody).toBeTruthy()
+    if (responceBody !=null){
+        console.log('user has logged in to the account even though the password is incorrect ')
+        }else
+    console.log(responceBody.error)
+    console.log('when you give it wrong email it doesnt generate any tokenn, and if you give it the right email with random input in password , it does generate a token ')
 })
-//hereeee
 test("POST SUCCESSFUL",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : 
@@ -104,7 +110,9 @@ test("  POST login unseccessfull",async ({request}) => {
     const responce = await request.post('https://reqres.in/api/login',{
         data : 
             {
-                "email": "eve.holt@reqres.in",
+                email: "eve.holt@reqres.in",
+                // password : "shouldnt be giving it password "
+
             }
     })
  const responceBody = JSON.parse (await responce.text())
@@ -145,3 +153,68 @@ test ( "PUT update ",async ({request}) => {
 
 })
 })
+test( ' POST  register unsuccessful ',async ({request}) => {
+    const responce = request.post(`${baseURL}api/register`,{
+        data : {
+            "email": "walikhan@gmail.com",
+            "password": "pistol"
+        }
+    })
+    const responceBody =JSON.parse(await (await responce).text())
+    // console.log(await (await responce).body())
+    console.log(responceBody.email)
+    console.log(await (await responce).status())
+    expect(await (await responce).status()).toBe(400)
+    // expect(await responceBody.email).toContain('w alikhan@gmail.com')
+    console.log(await (await responce).statusText())
+    console.log(await (await responce).text())
+    expect(await (await responce).text()).toContain('{"error":"Note: Only defined users succeed registration"}')
+})
+test( ' POST  register successful ',async ({request}) => {
+    const responce = request.post(`${baseURL}api/register`,{
+        data : {
+                "email": "eve.holt@reqres.in",
+                "password": "pistol"
+            }
+            
+        })
+        const responceBody =JSON.parse(await (await responce).text())
+        expect (responceBody.id).toBe(4)
+        expect((await responce).status()).toBe(200)
+        expect(await (await responce).statusText()).toBe('OK')
+        console.log(await (await responce).text())
+})
+test('PATCH update ',async ({request}) => {
+    const responce = await request.patch(`${baseURL}api/users/3`,{
+        data : {
+                "name": "cmon bruh ",
+                "job": "okay okay"
+        } 
+    })
+    const responceBody = JSON.parse(await responce.text())
+    expect (await responce.statusText()).toBe('OK')
+    expect (await responce.status()).toBe(200)
+    expect(await responceBody.job).toBe('okay okay')
+    console.log(responceBody.name)
+})
+
+test.only('  GET  Delayed responce ',async ({request}) => {
+    const responce  = await request.get(`${baseURL}api/users?delay=3`)
+    const responceBody = JSON.stringify(await responce.text())
+    console.log(await responce.status())
+    expect (await responce.status()).toBe(200)
+    console.log(await responce.statusText())
+    expect (await responce.statusText()).toBe('OK')
+    const timing = await request.timing()
+    const responcetime = timing.
+})
+import { Browser, Page, request,Request } from '@playwright/test'
+
+  test('should measure response time and assert on it', async ({request}) => {
+    const response: Response = await page.goto('https://example.com');
+    // const request = response.request();
+    const timing = await request.timing();
+    const responseTime = timing.responseEnd - timing.requestStart;
+
+    expect(responseTime).toBeLessThan(500); // Assert that response time is less than 500ms
+  })
